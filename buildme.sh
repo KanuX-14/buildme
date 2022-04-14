@@ -11,6 +11,7 @@ function make_packages()
         cp -v /boot/config-$OLD_VERSION .config
     else
         zcat -v /proc/config > .config
+    fi
 
     make olddefconfig
     make -j$(nproc)
@@ -47,14 +48,15 @@ sudo chown -R $current_user:$current_user ./*
 
 # Start building
 
-make_packages()
+make_packages
 
 # Installing the kernel
 
 if type dpkg &>/dev/null; then
-    automated_install()
+    automated_install
 else
-    manual_install()
+    manual_install
+fi
 
 # Prompt to remove old kernel
 
@@ -75,5 +77,6 @@ if type dpkg &>/dev/null; then
     sudo update-grub
 else
     sudo grub-mkconfig -o /boot/grub/grub.cfg
+fi
 
 printf "\nReboot in order to apply the changes.\n"
