@@ -2,54 +2,78 @@
 
 OLD_VERSION=$(uname -r)
 VERSION=$(make -s kernelversion)
+current_user="$USER"
+remove_kernel="N"
 
-# Copying the old config
+function make_packages()
+{
+    if type dpkg &>/dev/null; then
+        cp -v /boot/config-$OLD_VERSION .config
+    else
+        zcat -v /proc/config > .config
 
-cp -v /boot/config-$OLD_VERSION .config
+    make olddefconfig
+    make -j$(nproc)
+    make -j$(nproc) modules
+    make -j$(nproc) headers
+    make -j$(nproc) bzImage
+}
+
+# Mostly used in Debian-based distributions
+function automated_install()
+{
+    sudo make modules_install
+    sudo make headers_install
+    sudo make install
+    sudo update-initramfs -u
+}
+
+function manual_install()
+{
+    sudo make modules_install
+    sudo make headers_install
+    sudo cp -v arch/x86/boot/bzImage /boot/vmlinuz-linux-$VERSION
+    sudo mkinitcpio -z $VERSION -g /boot/initramfs-$VERSION.img
+    sudo mkinitcpio -p linux-$VERSION
+    sudo cp -v System.map /boot/System.map-$VERSION
+    sudo ln -sfv /boot/System.map-$VERSION /boot/System.map
+    # sudo cp -v .config /boot/config-$VERSION
+}
+
 
 # Making sure you own every file in the kernel
 
-sudo chown -R $USER:$USER ./*
+sudo chown -R $current_user:$current_user ./*
 
 # Start building
 
-make olddefconfig
-make -j$(nproc)
-make -j$(nproc) modules
-make -j$(nproc) headers
-make -j$(nproc) bzImage
+make_packages()
 
 # Installing the kernel
 
-sudo make modules_install
-sudo make headers_install
-sudo cp -v arch/x86/boot/bzImage /boot/vmlinuz-linux-$VERSION
-printf "# mkinitcpio preset file for the 'linux-$VERSION' package\n\
-\n\
-ALL_config=\"/etc/mkinitcpio.conf\"\n\
-ALL_kver=\"/boot/vmlinuz-linux-$VERSION\"\n\
-\n\
-PRESETS=('default' 'fallback')\n\
-\n\
-#default_config=\"/etc/mkinitcpio.conf\"\n\
-default_image=\"/boot/initramfs-linux-$VERSION.img\"\n\
-#default_options=\"\"\n\
-\n\
-#fallback_config=\"/etc/mkinitcpio.conf\"\n\
-fallback_image=\"/boot/initramfs-linux-fallback-$VERSION.img\"\n\
-fallback_options=\"-S autodetect\"\n" | sudo tee /etc/mkinitcpio.d/linux-$VERSION.preset
-sudo mkinitcpio -p linux-$VERSION
-sudo cp -v System.map /boot/System.map-$VERSION
-sudo ln -sf /boot/System.map-$VERSION /boot/System.map
-sudo cp -v .config /boot/config-$VERSION
+if type dpkg &>/dev/null; then
+    automated_install()
+else
+    manual_install()
 
-# Uncomment if you want to remove the old kernel
+# Prompt to remove old kernel
 
-# sudo rm -f /boot/*`uname -r`*
-# sudo rm -f /etc/mkinitcpio.d/*`uname -r`*
+read -p "Remove the $OLD_VERSION kernel? [N/y]" remove_kernel
+case remove_kernel in
+    Y | y)
+        sudo rm -fv /boot/*`uname -r`*
+        sudo rm -fv /etc/mkinitcpio.d/*`uname -r`*
+        ;;
+    *)
+        printf "Skipping...\n"
+        ;;
+esac
 
 # Finish installation and prompt reboot
 
-sudo grub-mkconfig -o /boot/grub/grub.cfg
-read -p "Press [ENTER] to reboot..." key
-sudo reboot
+if type dpkg &>/dev/null; then
+    sudo update-grub
+else
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+printf "\nReboot in order to apply the changes.\n"
