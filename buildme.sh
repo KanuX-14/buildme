@@ -2,6 +2,7 @@
 
 OLD_VERSION=$(uname -r)
 VERSION=$(make -s kernelversion)
+CORE=$(nproc)
 current_user="$USER"
 remove_kernel="N"
 
@@ -14,10 +15,10 @@ function make_packages()
     fi
 
     make olddefconfig
-    make -j$(nproc)
-    make -j$(nproc) modules
-    make -j$(nproc) headers
-    make -j$(nproc) bzImage
+    make -j$CORE
+    make -j$CORE modules
+    make -j$CORE headers
+    make -j$CORE bzImage
 }
 
 # Mostly used in Debian-based distributions
@@ -33,9 +34,9 @@ function manual_install()
 {
     sudo make modules_install
     sudo make headers_install
+    VERSION=$(ls /lib/modules | grep "$VERSION" | head -n 1)
     sudo cp -v arch/x86/boot/bzImage /boot/vmlinuz-linux-$VERSION
-    sudo mkinitcpio -z $VERSION -g /boot/initramfs-$VERSION.img
-    sudo mkinitcpio -p linux-$VERSION
+    sudo mkinitcpio -k $VERSION -g /boot/initramfs-linux-$VERSION.img
     sudo cp -v System.map /boot/System.map-$VERSION
     sudo ln -sfv /boot/System.map-$VERSION /boot/System.map
     # sudo cp -v .config /boot/config-$VERSION
