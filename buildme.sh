@@ -6,6 +6,15 @@ CORE=$(nproc)
 current_user="$USER"
 remove_kernel="N"
 
+# Colours
+RED="\e[1;31m"
+GREEN="\e[1;32m"
+YELLOW="\e[1;33m"
+BLUE="\e[1;34m"
+PURPLE="\e[1;35m"
+CYAN="\e[1;36m"
+RESET_COLOUR="\e[0m"
+
 function make_packages()
 {
     if type dpkg &>/dev/null; then
@@ -67,11 +76,13 @@ case remove_kernel in
         sudo rm -fv /boot/*$OLD_VERSION*
         sudo rm -rfv /lib/modules/*$OLD_VERSION*
         sudo rm -fv /etc/mkinitcpio.d/*$OLD_VERSION*
+        printf "$YELLOW""Warning: $OLD_VERSION kernel has been removed.""$RESET_COLOUR""\n"
         ;;
     *)
-        printf "Skipping...\n"
+        printf "$YELLOW""Warning: $OLD_VERSION kernel will be skipped.""$RESET_COLOUR""\n"
         ;;
 esac
+printf "\n"
 
 # Finish installation and prompt reboot
 
@@ -81,4 +92,4 @@ else
     sudo grub-mkconfig -o /boot/grub/grub.cfg
 fi
 
-printf "\nReboot in order to apply the changes.\n"
+printf "Reboot in order to apply the changes.\n"
