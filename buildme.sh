@@ -61,11 +61,12 @@ fi
 
 # Prompt to remove old kernel
 
-read -p "Remove the $OLD_VERSION kernel? [N/y]" remove_kernel
+read -p "Remove the $OLD_VERSION kernel? [N/y] " remove_kernel
 case remove_kernel in
-    Y | y)
-        sudo rm -fv /boot/*`uname -r`*
-        sudo rm -fv /etc/mkinitcpio.d/*`uname -r`*
+    "Y"|"y"|"Yes"|"yes")
+        sudo rm -fv /boot/*$OLD_VERSION*
+        sudo rm -rfv /lib/modules/*$OLD_VERSION*
+        sudo rm -fv /etc/mkinitcpio.d/*$OLD_VERSION*
         ;;
     *)
         printf "Skipping...\n"
