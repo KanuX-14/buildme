@@ -48,7 +48,7 @@ function manual_install()
     sudo mkinitcpio -k $VERSION -g /boot/initramfs-linux-$VERSION.img
     sudo cp -v System.map /boot/System.map-$VERSION
     sudo ln -sfv /boot/System.map-$VERSION /boot/System.map
-    # sudo cp -v .config /boot/config-$VERSION
+    sudo cp -v .config /boot/config-$VERSION
 }
 
 
