@@ -70,7 +70,7 @@ fi
 # Prompt to remove old kernel
 
 read -p "Remove the $OLD_VERSION kernel? [N/y] " remove_kernel
-case remove_kernel in
+case $remove_kernel in
     "Y"|"y"|"Yes"|"yes")
         sudo rm -fv /boot/*$OLD_VERSION*
         sudo rm -rfv /lib/modules/*$OLD_VERSION*
