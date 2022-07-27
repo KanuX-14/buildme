@@ -2,7 +2,7 @@
 
 OLD_VERSION=$(uname -r)
 VERSION=$(make -s kernelversion)
-CORE=$(nproc)
+CORE=1 # $(nproc)
 current_user="$USER"
 remove_kernel="N"
 
@@ -50,7 +50,6 @@ function manual_install()
     sudo ln -sfv /boot/System.map-$VERSION /boot/System.map
     sudo cp -v .config /boot/config-$VERSION
 }
-
 
 # Making sure you own every file in the kernel
 
