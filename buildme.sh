@@ -43,7 +43,7 @@ function manual_install()
 {
     sudo make modules_install
     sudo make headers_install
-    VERSION=$(ls /lib/modules | grep "$VERSION" | head -n 1)
+    VERSION=$(ls /lib/modules | grep "$VERSION" | sort --reverse - | head -n 1)
     sudo cp -v arch/x86/boot/bzImage /boot/vmlinuz-linux-$VERSION
     sudo mkinitcpio -k $VERSION -g /boot/initramfs-linux-$VERSION.img
     sudo cp -v System.map /boot/System.map-$VERSION
