@@ -17,10 +17,12 @@ RESET_COLOUR="\e[0m"
 
 function make_packages()
 {
-    if type dpkg &>/dev/null; then
-        cp -v /boot/config-$OLD_VERSION .config
-    else
-        zcat -v /proc/config > .config
+    if ! ls .config; then
+        if type dpkg &>/dev/null; then
+            cp -v /boot/config-$OLD_VERSION .config
+        else
+            zcat -v /proc/config > .config
+        fi
     fi
 
     make olddefconfig
