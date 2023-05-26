@@ -7,13 +7,13 @@ current_user="$USER"
 remove_kernel="N"
 
 # Colours
-RED="\e[1;31m"
-GREEN="\e[1;32m"
-YELLOW="\e[1;33m"
-BLUE="\e[1;34m"
-PURPLE="\e[1;35m"
-CYAN="\e[1;36m"
-RESET_COLOUR="\e[0m"
+RED="\x1b[1;31m"
+GREEN="\x1b[1;32m"
+YELLOW="\x1b[1;33m"
+BLUE="\x1b[1;34m"
+PURPLE="\x1b[1;35m"
+CYAN="\x1b[1;36m"
+RESET_COLOUR="\x1b[0m"
 
 MAKE_PACKAGES()
 {
