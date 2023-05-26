@@ -15,7 +15,7 @@ PURPLE="\e[1;35m"
 CYAN="\e[1;36m"
 RESET_COLOUR="\e[0m"
 
-function make_packages()
+MAKE_PACKAGES()
 {
     if ! ls .config; then
         if type dpkg &>/dev/null; then
@@ -33,7 +33,7 @@ function make_packages()
 }
 
 # Mostly used in Debian-based distributions
-function automated_install()
+AUTOMATED_INSTALL()
 {
     sudo make modules_install
     sudo make headers_install
@@ -41,7 +41,7 @@ function automated_install()
     sudo update-initramfs -u
 }
 
-function manual_install()
+MANUAL_INSTALL()
 {
     sudo make modules_install
     sudo make headers_install
@@ -59,14 +59,14 @@ sudo chown -R $current_user:$current_user ./*
 
 # Start building
 
-make_packages
+MAKE_PACKAGES
 
 # Installing the kernel
 
 if type dpkg &>/dev/null; then
-    automated_install
+    AUTOMATED_INSTALL
 else
-    manual_install
+    MANUAL_INSTALL
 fi
 
 # Prompt to remove old kernel
